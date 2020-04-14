@@ -1,0 +1,93 @@
+# Options
+# --stage      Stage name e.g. dev / prod
+# --region     AWS Region to deploy e.g. us-west-2
+
+service: poc-pact-members-api
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  stage: ${opt:stage}
+  region: ${opt:region}
+  timeout: 30
+  memorySize: 256
+  logRetentionInDays: 30
+  versionFunctions: false
+  iamManagedPolicies:
+    - arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess
+    - arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:*
+      Resource: "*"
+  deploymentBucket:
+    name: sls-artifacts-${self:provider.region}-${self:custom.awsAccountId}
+  tracing:
+    apiGateway: true
+    lambda: true
+  apiGateway:
+    minimumCompressionSize: 2048
+  # cfnRole: ${opt:cfnRole}
+
+functions:
+  core:
+    handler: src/api.handler
+    events:
+      - http:
+          path: /version
+          method: get
+          cors: ${self:custom.cors}
+          private: false
+      - http:
+          path: /registration
+          method: post
+          cors: ${self:custom.cors}
+          private: false
+
+plugins:
+  - serverless-webpack
+  - serverless-offline
+
+custom:
+  awsAccountId: ${file(./deploy/scripts/get-aws-account-id.js)}
+  envFile: ${file(./deploy/environments/${self:provider.stage}.yml)}
+  cors:
+    origin: '*'
+    headers:
+      - Content-Type
+      - X-Amz-Date
+      - Authorization
+      - X-Api-Key
+      - X-Amz-Security-Token
+      - X-Amz-User-Agent
+      - X-Requested-With
+    allowCredentials: false
+  serverless-offline:
+    port: 3001
+    host: 0.0.0.0
+  webpack:
+    webpackConfig: ./deploy/webpack.config.js
+    includeModules:
+      forceExclude:
+        - aws-sdk
+
+resources:
+  - Resources:
+      ApiGatewayLogGroup:
+        Type: AWS::Logs::LogGroup
+        Properties:
+          LogGroupName: /aws/api-gateway/${self:service}-${self:provider.stage}
+          RetentionInDays: ${self:provider.logRetentionInDays} 
+      MembersTable:
+        Type: AWS::DynamoDB::Table
+        DeletionPolicy: Retain
+        Properties:
+          TableName: poc-pact-members-${self:provider.stage}
+          AttributeDefinitions:
+            - AttributeName: userId
+              AttributeType: S
+          KeySchema:
+            - AttributeName: userId
+              KeyType: HASH
+          BillingMode: PAY_PER_REQUEST

@@ -1,0 +1,5 @@
+# Runtime environment variables
+Lambda:
+  LOG_LEVEL: debug
+  STAGE: ${self:provider.stage}
+  MEMBERS_TABLE_NAME: poc-pact-members-${self:provider.stage}

@@ -1,0 +1,105 @@
+version: 2.1
+
+executors:
+  default:
+    working_directory: ~/workspace
+    docker:
+      - image: circleci/node:12
+    environment:
+      TZ: /usr/share/zoneinfo/Asia/Tokyo
+
+
+commands:
+  system_info:
+    steps:
+      - run:
+          name: System information
+          command: |
+            echo "Node $(node -v)"
+            echo "Yarn v$(yarn -v)"
+  setup:
+    steps:
+      - restore_cache:
+          name: Restore Yarn Package Cache
+          key: v1-yarn-packages-{{ checksum "yarn.lock" }}
+      - run:
+          name: Setup
+          command: yarn setup
+      - save_cache:
+          name: Save Yarn Package Cache
+          key: v1-yarn-packages-{{ checksum "yarn.lock" }}
+          paths:
+            - ~/.cache/yarn
+
+
+jobs:
+  setup:
+    executor:
+      name: default
+    steps:
+      - system_info
+      - checkout
+      - setup
+      - persist_to_workspace:
+          root: ~/workspace
+          paths:
+            - ./*
+  lint:
+    executor:
+      name: default
+    steps:
+      - attach_workspace:
+          at: ~/workspace
+      - run:
+          name: Lint
+          command: |
+            mkdir -p ~/reports
+            yarn lint --output-file ~/reports/eslint/results.xml
+      - store_artifacts:
+          path: ~/reports
+      - store_test_results:
+          path: ~/reports
+  test:
+    executor:
+      name: default
+    steps:
+      - attach_workspace:
+          at: ~/workspace
+      - run:
+          name: Test
+          command: yarn test --maxWorkers=2
+      - store_artifacts:
+          path: coverage
+      - store_test_results:
+          path: coverage
+  # build:
+  #   executor:
+  #     name: default
+  #   steps:
+  #     - attach_workspace:
+  #         at: ~/workspace
+  #     - run:
+  #         name: Build
+  #         command: |
+  #           yarn build:webpack
+  #     # - store_artifacts:
+  #     #     path: dist
+  #     - persist_to_workspace:
+  #         root: ~/workspace
+  #         paths:
+  #           - ./*
+
+workflows:
+  version: 2
+  build-deploy-flow:
+    jobs:
+      - setup
+      - lint:
+          requires:
+            - setup
+      - test:
+          requires:
+            - setup
+      # - build:
+      #     requires:
+      #       - setup

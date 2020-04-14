@@ -1,0 +1,58 @@
+env:
+  es6: true
+  node: true
+extends:
+  - 'eslint:recommended'
+  - 'plugin:@typescript-eslint/recommended'
+  - 'plugin:jest/recommended'
+plugins:
+  - '@typescript-eslint'
+parserOptions:
+  parser: '@typescript-eslint/parser'
+  tsconfigRootDir: ./
+  sourceType: module
+
+rules:
+  array-bracket-spacing:
+    - error
+    - always
+  max-len:
+    - error
+    - code: 120
+      ignoreComments: true
+      ignoreTrailingComments: true
+      ignoreUrls: true
+      ignoreTemplateLiterals: true
+      ignoreRegExpLiterals: true
+  no-var: error
+  no-console: off
+  object-curly-spacing:
+    - error
+    - always
+  semi:
+    - error
+    - never
+    - beforeStatementContinuationChars: never
+  space-before-blocks:
+    - error
+    - always
+  semi-spacing:
+    - error
+    - after: true
+      before: false
+  quotes:
+    - error
+    - single
+
+  '@typescript-eslint/indent':
+    - error
+    - 2
+  # Due to an inappropriate type definition of Lambda API
+  '@typescript-eslint/no-non-null-assertion': off
+  # To arrange a style of interface definition
+  '@typescript-eslint/member-delimiter-style': off
+  # Use type inference
+  '@typescript-eslint/explicit-function-return-type': off
+  # TypeScript compiler checks this
+  '@typescript-eslint/no-unused-vars': off
+  
