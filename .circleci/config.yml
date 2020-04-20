@@ -72,22 +72,38 @@ jobs:
           path: coverage
       - store_test_results:
           path: coverage
-  # build:
-  #   executor:
-  #     name: default
-  #   steps:
-  #     - attach_workspace:
-  #         at: ~/workspace
-  #     - run:
-  #         name: Build
-  #         command: |
-  #           yarn build:webpack
-  #     # - store_artifacts:
-  #     #     path: dist
-  #     - persist_to_workspace:
-  #         root: ~/workspace
-  #         paths:
-  #           - ./*
+  build:
+    executor:
+      name: default
+    steps:
+      - attach_workspace:
+          at: ~/workspace
+      - run:
+          name: Build
+          command: |
+            yarn build-webpack
+      - store_artifacts:
+          path: dist
+      - persist_to_workspace:
+          root: ~/workspace
+          paths:
+            - ./*
+  deploy-dev:
+    executor:
+      name: default
+    steps:
+      - attach_workspace:
+          at: ~/workspace
+      - run:
+          name: Build
+          command: |
+            yarn deploy-dev
+      - store_artifacts:
+          path: dist
+      - persist_to_workspace:
+          root: ~/workspace
+          paths:
+            - ./*
 
 workflows:
   version: 2
@@ -100,6 +116,18 @@ workflows:
       - test:
           requires:
             - setup
-      # - build:
-      #     requires:
-      #       - setup
+      - build:
+          context: poc-pact-members-api-dev
+          requires:
+            - setup
+      - deploy-dev:
+          context: poc-pact-members-api-dev
+          requires:
+            - setup
+            - lint
+            - test
+            - build
+          filters:
+            branches:
+              only:
+                - master
