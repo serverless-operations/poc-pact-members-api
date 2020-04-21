@@ -3,7 +3,7 @@ import ValidationError from '~/errors/ValidationError'
 import MemberRegistrationService from '~/services/MemberRegistraionService'
 import RegistrationForm from '~/models/MemberRegistrationForm'
 
-type APIRequestBody = {
+export type APIRequestBody = {
   userId?: string
   nickname?: string
   gender?: string
@@ -11,7 +11,7 @@ type APIRequestBody = {
   tosAgreed?: boolean
 }
 
-type APIResponseBody = RegistrationForm
+export type APIResponseBody = RegistrationForm
 
 export default class PostRegistrationAction {
 
