@@ -3,8 +3,6 @@ import { Request, Response, ErrorHandlingMiddleware } from 'lambda-api'
 import { ErrorCode } from '~/errors/ErrorCode'
 
 import AuthorizationError from '~/errors/AuthorizationError'
-import ConflictError from '~/errors/ConflictError'
-import ForbiddenError from '~/errors/ForbiddenError'
 import InternalServerError from '~/errors/InternalServerError'
 import ValidationError from '~/errors/ValidationError'
 
@@ -13,14 +11,12 @@ interface ResponseParams {
   statusCode: number
   error: ErrorCode
   message: string
-  /* eslint-disable @typescript-eslint/no-explicit-any */
-  errorData?: any
 }
 
-const respond = ({ res, statusCode, error, message, errorData }: ResponseParams) =>
-  res.status(statusCode).cors({}).json({ error, message, errorData })
+const respond = ({ res, statusCode, error, message }: ResponseParams) =>
+  res.status(statusCode).cors({}).json({ error, message })
 
-const errorSentinel = (err: Error, req: Request, res: Response, next: ErrorHandlingMiddleware): void => {
+const unexpectedErrorHandler = (err: Error, req: Request, res: Response, next: ErrorHandlingMiddleware): void => {
   respond({
     res,
     statusCode: 500,
@@ -46,22 +42,6 @@ const authorizationErrorHandler = (err: Error, req: Request, res: Response, next
   next(err, req, res, next)
 }
 
-const forbiddenErrorHandler = (err: Error, req: Request, res: Response, next: ErrorHandlingMiddleware): void => {
-  if (err instanceof ForbiddenError) {
-    const { error, message } = err
-    respond({ res, statusCode: 403, error, message })
-  }
-  next(err, req, res, next)
-}
-
-const conflictErrorHandler = (err: Error, req: Request, res: Response, next: ErrorHandlingMiddleware): void => {
-  if (err instanceof ConflictError) {
-    const { error, message } = err
-    respond({ res, statusCode: 409, error, message })
-  }
-  next(err, req, res, next)
-}
-
 const internalServerErrorHandler = (err: Error, req: Request, res: Response, next: ErrorHandlingMiddleware): void => {
   if (err instanceof InternalServerError) {
     const { error, message } = err
@@ -73,8 +53,6 @@ const internalServerErrorHandler = (err: Error, req: Request, res: Response, nex
 export default [
   validationErrorHandler,
   authorizationErrorHandler,
-  forbiddenErrorHandler,
-  conflictErrorHandler,
   internalServerErrorHandler,
-  errorSentinel
+  unexpectedErrorHandler
 ]

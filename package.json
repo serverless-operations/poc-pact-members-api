@@ -14,16 +14,19 @@
     "source-map-support": "^0.5.16"
   },
   "devDependencies": {
+    "@pact-foundation/pact": "^9.9.12",
     "@types/aws-lambda": "^8.10.40",
     "@types/jest": "^25.1.2",
     "@types/lodash": "^4.14.149",
     "@types/node": "^13.7.0",
     "@typescript-eslint/eslint-plugin": "^2.19.0",
     "@typescript-eslint/parser": "^2.19.0",
+    "dotenv": "^8.2.0",
     "eslint": "^6.8.0",
     "eslint-plugin-jest": "^23.7.0",
     "jest": "^25.1.0",
     "serverless": "1.63.0",
+    "serverless-dotenv-plugin": "^2.4.2",
     "serverless-offline": "^5.12.1",
     "serverless-webpack": "^5.3.1",
     "ts-jest": "^25.2.0",
@@ -35,15 +38,17 @@
   },
   "scripts": {
     "lint": "eslint ./src --ext .ts",
-    "lint-fix": "eslint ./src --fix --ext .ts",
-    "test": "jest --coverage --config test/jest.config.js",
+    "lint:fix": "eslint ./src --fix --ext .ts",
+    "test:units": "jest --coverage --config test/jest.config.units.js",
+    "test:integrations": "jest --coverage --config test/jest.config.integrations.js",
+    "test:pact": "jest --coverage --config test/jest.config.pact.js",
     "serve": "sls offline start --stage dev --region us-east-1",
     "clean": "rm -rf target yarn.lock node_modules",
     "ts-node": "ts-node -r tsconfig-paths/register",
     "setup": "yarn install",
-    "build-compile": "tsc -p tsconfig.json",
-    "build-webpack": "sls webpack --stage dev --region us-west-2",
-    "deploy-dev": "sls deploy --stage dev --region us-west-2",
-    "remove-dev": "sls remove --stage dev --region us-west-2"
+    "build:compile": "tsc -p tsconfig.json",
+    "build:webpack": "sls webpack --stage dev --region us-west-2",
+    "deploy:dev": "sls deploy --stage dev --region us-west-2",
+    "remove:dev": "sls remove --stage dev --region us-west-2"
   }
 }

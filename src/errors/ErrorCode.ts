@@ -1,12 +1,9 @@
-export type APIError =
+export type ErrorCode =
+  // 400
   'MISSING_REQUIRED_PARAMETER' |
   'INVALID_PARAMETER' |
+  // 401
   'UNAUTHORIZED_ERROR' |
+  // 500
   'INTERNAL_SERVER_ERROR' |
-  'FORBIDDEN_ACCESST' |
-
-  'ITEM_NOT_FOUND' |
-
   'UNEXPECTED_ERROR'
-
-export type ErrorCode = APIError

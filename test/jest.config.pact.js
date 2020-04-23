@@ -1,6 +1,15 @@
+require('dotenv').config()
+
+const TEST_TYPE = 'pact'
+
 module.exports = {
   preset: 'ts-jest',
   rootDir: '../',
+  testTimeout: 10000,
+  coverageDirectory: `.coverage/${TEST_TYPE}`,
+  testMatch: [
+    `<rootDir>/test/${TEST_TYPE}/**/*.test.ts`
+  ],
   moduleFileExtensions: [
     'ts',
     'js',
@@ -18,6 +27,5 @@ module.exports = {
     '**/src/**/*.ts',
     '!**/src/**/*.d.ts',
     '!**/src/api.ts'
-  ],
-  coverageDirectory: './coverage'
+  ]
 }

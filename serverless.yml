@@ -13,9 +13,6 @@ provider:
   memorySize: 256
   logRetentionInDays: 30
   versionFunctions: false
-  iamManagedPolicies:
-    - arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess
-    - arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -23,12 +20,6 @@ provider:
       Resource: "*"
   deploymentBucket:
     name: sls-artifacts-${self:provider.region}-${self:custom.awsAccountId}
-  tracing:
-    apiGateway: true
-    lambda: true
-  apiGateway:
-    minimumCompressionSize: 2048
-  # cfnRole: ${opt:cfnRole}
 
 functions:
   core:
@@ -44,14 +35,15 @@ functions:
           method: post
           cors: ${self:custom.cors}
           private: false
+    environment: ${self:custom.envVars.${self:provider.stage}}
 
 plugins:
+  - serverless-dotenv-plugin
   - serverless-webpack
   - serverless-offline
 
 custom:
   awsAccountId: ${file(./deploy/scripts/get-aws-account-id.js)}
-  envFile: ${file(./deploy/environments/${self:provider.stage}.yml)}
   cors:
     origin: '*'
     headers:
@@ -63,6 +55,12 @@ custom:
       - X-Amz-User-Agent
       - X-Requested-With
     allowCredentials: false
+  dotenv:
+    logging: false
+  envVars:
+    dev:
+      STAGE: ${self:provider.stage}
+      LOG_LEVEL: debug
   serverless-offline:
     port: 3001
     host: 0.0.0.0
