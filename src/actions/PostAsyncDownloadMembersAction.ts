@@ -1,4 +1,4 @@
-import { Request, Response } from 'lambda-api'
+import { Request } from 'lambda-api'
 import AsyncOperationService from '~/services/AsyncOperationService'
 
 export type APIRequestBody = {
@@ -10,11 +10,11 @@ export type APIResponseBody = {
 
 export default class PostAsyncDownloadMembersAction {
 
-  public async handle(_req: Request, res: Response) {
+  public async handle(_req: Request) {
 
     const service = new AsyncOperationService()
     const asyncRequestId = await service.acceptRequest({ type: 'download_members' })
 
-    res.status(202).json({ asyncRequestId })
+    return { asyncRequestId }
   }
 }

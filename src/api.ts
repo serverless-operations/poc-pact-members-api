@@ -24,10 +24,10 @@ api.post('/registration',
   req => new PostRegistrationAction().handle(req))
 
 api.post('/async/download_members',
-  (req, res) => new PostAsyncDownloadMembersAction().handle(req, res))
+  req => new PostAsyncDownloadMembersAction().handle(req))
 
 api.get('/async/status/:request_id',
-  (req, res) => new GetAsyncRequestStatusAction().handle(req, res))
+  req => new GetAsyncRequestStatusAction().handle(req))
 
 exports.handler = async (event: APIGatewayEvent, context: Context): Promise<void> => {
   return await api.run(event, context).catch((err: Error) => console.log('Thrown error during invocation: ', err))
