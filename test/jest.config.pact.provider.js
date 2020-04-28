@@ -1,14 +1,14 @@
 require('dotenv').config()
 
-const TEST_TYPE = 'pact'
+const TEST_TYPE = 'pact/provider'
 
 module.exports = {
   preset: 'ts-jest',
   rootDir: '../',
-  testTimeout: 10000,
+  testTimeout: 30000,
   coverageDirectory: `.coverage/${TEST_TYPE}`,
   testMatch: [
-    `<rootDir>/test/${TEST_TYPE}/**/*.test.ts`
+    `<rootDir>/test/${TEST_TYPE}.test.ts`
   ],
   moduleFileExtensions: [
     'ts',

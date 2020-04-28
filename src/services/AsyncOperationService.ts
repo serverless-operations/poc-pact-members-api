@@ -14,7 +14,8 @@ export default class AsyncOperationRequestService {
 
     const asyncOperation = await DynamoDB.get({
       TableName: Environment.ASYNC_OPERATIONS_TABLE_NAME,
-      Key: { asyncRequestId }
+      Key: { asyncRequestId },
+      ConsistentRead: true
     }).promise().then(res => res.Item as AsyncOperation)
 
     if (!asyncOperation) {

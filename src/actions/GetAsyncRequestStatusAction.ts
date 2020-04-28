@@ -33,7 +33,6 @@ export default class GetAsyncRequestStatusAction {
   }
 
   private validate(pathParameters: Request['pathParameters']) {
-
     const asyncRequestId = pathParameters?.request_id
     if (!asyncRequestId) {
       throw new ValidationError('MISSING_REQUIRED_PARAMETER', 'Missing required parameter - asyncRequestId')
