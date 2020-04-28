@@ -47,11 +47,13 @@ export default class AsyncOperationRequestService {
       data: { downloadUrl: null }
     }
 
+    // TODO Testing DynamoDB Stream
     await DynamoDB.put({
       TableName: Environment.ASYNC_OPERATIONS_TABLE_NAME,
       Item: downloadMembersRequest
     }).promise()
 
+    // For now, testing SNS instead
     await SNS.publish({
       TopicArn: Environment.ASYNC_OPERATION_SNS_TOPIC_ARN,
       Message: asyncRequestId
