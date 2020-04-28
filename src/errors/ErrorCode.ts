@@ -4,6 +4,8 @@ export type ErrorCode =
   'INVALID_PARAMETER' |
   // 401
   'UNAUTHORIZED_ERROR' |
+  // 404
+  'NOT_FOUND_ERROR' |
   // 500
   'INTERNAL_SERVER_ERROR' |
   'UNEXPECTED_ERROR'

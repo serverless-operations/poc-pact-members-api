@@ -5,6 +5,8 @@ import pkg from '../package.json'
 import ErrorHandlers from '~/errors/ErrorHandlers'
 
 import PostRegistrationAction from '~/actions/PostRegistrationAction'
+import PostAsyncDownloadMembersAction from './actions/PostAsyncDownloadMembersAction'
+import GetAsyncRequestStatusAction from './actions/GetAsyncRequestStatusAction'
 
 const api = API({ version: pkg.version })
 
@@ -20,6 +22,12 @@ api.get('/version',
 
 api.post('/registration',
   req => new PostRegistrationAction().handle(req))
+
+api.post('/async/download_members',
+  (req, res) => new PostAsyncDownloadMembersAction().handle(req, res))
+
+api.get('/async/status/:request_id',
+  (req, res) => new GetAsyncRequestStatusAction().handle(req, res))
 
 exports.handler = async (event: APIGatewayEvent, context: Context): Promise<void> => {
   return await api.run(event, context).catch((err: Error) => console.log('Thrown error during invocation: ', err))

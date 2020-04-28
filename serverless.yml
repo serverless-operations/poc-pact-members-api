@@ -17,6 +17,7 @@ provider:
     - Effect: Allow
       Action:
         - dynamodb:*
+        - sns:*
       Resource: "*"
   deploymentBucket:
     name: sls-artifacts-${self:provider.region}-${self:custom.awsAccountId}
@@ -24,6 +25,7 @@ provider:
 functions:
   core:
     handler: src/api.handler
+    environment: ${self:custom.envVars.${self:provider.stage}}
     events:
       - http:
           path: /version
@@ -35,7 +37,16 @@ functions:
           method: post
           cors: ${self:custom.cors}
           private: false
-    environment: ${self:custom.envVars.${self:provider.stage}}
+      - http:
+          path: /async/download_members
+          method: post
+          cors: ${self:custom.cors}
+          private: false
+      - http:
+          path: /async/status/{request_id}
+          method: get
+          cors: ${self:custom.cors}
+          private: false
 
 plugins:
   - serverless-dotenv-plugin
@@ -72,11 +83,13 @@ custom:
 
 resources:
   - Resources:
+
       ApiGatewayLogGroup:
         Type: AWS::Logs::LogGroup
         Properties:
           LogGroupName: /aws/api-gateway/${self:service}-${self:provider.stage}
           RetentionInDays: ${self:provider.logRetentionInDays} 
+
       MembersTable:
         Type: AWS::DynamoDB::Table
         DeletionPolicy: Retain
@@ -87,5 +100,18 @@ resources:
               AttributeType: S
           KeySchema:
             - AttributeName: userId
+              KeyType: HASH
+          BillingMode: PAY_PER_REQUEST
+
+      AsyncOperationsTable:
+        Type: AWS::DynamoDB::Table
+        DeletionPolicy: Retain
+        Properties:
+          TableName: poc-pact-members-async-operations-${self:provider.stage}
+          AttributeDefinitions:
+            - AttributeName: asyncRequestId
+              AttributeType: S
+          KeySchema:
+            - AttributeName: asyncRequestId
               KeyType: HASH
           BillingMode: PAY_PER_REQUEST

@@ -5,6 +5,7 @@ import { ErrorCode } from '~/errors/ErrorCode'
 import AuthorizationError from '~/errors/AuthorizationError'
 import InternalServerError from '~/errors/InternalServerError'
 import ValidationError from '~/errors/ValidationError'
+import NotFoundError from '~/errors/NotFoundError'
 
 interface ResponseParams {
   res: Response
@@ -17,6 +18,7 @@ const respond = ({ res, statusCode, error, message }: ResponseParams) =>
   res.status(statusCode).cors({}).json({ error, message })
 
 const unexpectedErrorHandler = (err: Error, req: Request, res: Response, next: ErrorHandlingMiddleware): void => {
+  console.error(err)
   respond({
     res,
     statusCode: 500,
@@ -42,6 +44,14 @@ const authorizationErrorHandler = (err: Error, req: Request, res: Response, next
   next(err, req, res, next)
 }
 
+const notFoundErrorHandler = (err: Error, req: Request, res: Response, next: ErrorHandlingMiddleware): void => {
+  if (err instanceof NotFoundError) {
+    const { error, message } = err
+    respond({ res, statusCode: 404, error, message })
+  }
+  next(err, req, res, next)
+}
+
 const internalServerErrorHandler = (err: Error, req: Request, res: Response, next: ErrorHandlingMiddleware): void => {
   if (err instanceof InternalServerError) {
     const { error, message } = err
@@ -53,6 +63,7 @@ const internalServerErrorHandler = (err: Error, req: Request, res: Response, nex
 export default [
   validationErrorHandler,
   authorizationErrorHandler,
+  notFoundErrorHandler,
   internalServerErrorHandler,
   unexpectedErrorHandler
 ]
