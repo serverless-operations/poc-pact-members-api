@@ -10,6 +10,27 @@ import NotFoundError from '~/errors/NotFoundError'
 
 export default class AsyncOperationRequestService {
 
+  public async loadAsyncOperationRecord(asyncRequestId: string) {
+
+    const asyncOperation = await DynamoDB.get({
+      TableName: Environment.ASYNC_OPERATIONS_TABLE_NAME,
+      Key: { asyncRequestId }
+    }).promise().then(res => res.Item as AsyncOperation)
+
+    if (!asyncOperation) {
+      throw new Error(`asyncOperation is not found - asyncRequestId: ${asyncRequestId}`)
+    }
+
+    return asyncOperation
+  }
+
+  public async updateAsyncOperationRecord(asyncOperation: AsyncOperation) {
+    await DynamoDB.put({ // TODO Use UPDATE
+      TableName: Environment.ASYNC_OPERATIONS_TABLE_NAME,
+      Item: asyncOperation
+    }).promise()
+  }
+
   public async acceptRequest(params: { type: AsyncOperation['type'] }): Promise<string> {
 
     switch (params.type) {
@@ -55,7 +76,7 @@ export default class AsyncOperationRequestService {
 
     // For now, testing SNS instead
     await SNS.publish({
-      TopicArn: Environment.ASYNC_OPERATION_SNS_TOPIC_ARN,
+      TopicArn: Environment.ASYNC_DOWNLOAD_MEMBERS_TOPIC_ARN,
       Message: asyncRequestId
     }).promise()
 

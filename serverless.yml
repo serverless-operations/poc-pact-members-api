@@ -1,6 +1,6 @@
 # Options
-# --stage      Stage name e.g. dev / prod
-# --region     AWS Region to deploy e.g. us-west-2
+# --stage  Stage name e.g. dev / prod
+# --region AWS Region to deploy e.g. us-west-2
 
 service: poc-pact-members-api
 
@@ -18,6 +18,7 @@ provider:
       Action:
         - dynamodb:*
         - sns:*
+        - s3:*
       Resource: "*"
   deploymentBucket:
     name: sls-artifacts-${self:provider.region}-${self:custom.awsAccountId}
@@ -47,6 +48,12 @@ functions:
           method: get
           cors: ${self:custom.cors}
           private: false
+  event:
+    handler: src/event.handler
+    environment: ${self:custom.envVars.${self:provider.stage}}
+    timeout: 300
+    events:
+      - sns: ${self:custom.sns.asyncDownloadMembersArn}
 
 plugins:
   - serverless-dotenv-plugin
@@ -54,6 +61,9 @@ plugins:
   - serverless-offline
 
 custom:
+  sns:
+    asyncDownloadMembersTopicName: poc-pact-members-async-download-members-${self:provider.stage}
+    asyncDownloadMembersArn: arn:aws:sns:${self:provider.region}:${self:custom.awsAccountId}:${self:custom.sns.asyncDownloadMembersTopicName}
   awsAccountId: ${file(./deploy/scripts/get-aws-account-id.js)}
   cors:
     origin: '*'
@@ -72,6 +82,8 @@ custom:
     dev:
       STAGE: ${self:provider.stage}
       LOG_LEVEL: debug
+      S3_BUCKET: poc-pact-members-${self:provider.region}-${self:custom.awsAccountId}
+      ASYNC_DOWNLOAD_MEMBERS_TOPIC_ARN: ${self:custom.sns.asyncDownloadMembersArn}
   serverless-offline:
     port: 3001
     host: 0.0.0.0
@@ -115,3 +127,8 @@ resources:
             - AttributeName: asyncRequestId
               KeyType: HASH
           BillingMode: PAY_PER_REQUEST
+
+      AsyncDownloadMembersTopic:
+        Type: AWS::SNS::Topic
+        Properties:
+          TopicName: ${self:custom.sns.asyncDownloadMembersTopicName}

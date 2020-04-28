@@ -8,4 +8,5 @@ export type ErrorCode =
   'NOT_FOUND_ERROR' |
   // 500
   'INTERNAL_SERVER_ERROR' |
+  'ASSERTION_ERROR' |
   'UNEXPECTED_ERROR'
