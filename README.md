@@ -10,7 +10,7 @@ HTTP API Provider テストの場合、予め Consumer からブローカーへ�
 
 ### 実行環境
 - Node.js `v12.13.0` 以上
-- Yarn `1.22.0￥ 以上
+- Yarn `1.22.0` 以上
 
 ### 依存関係のセットアップ
 ```shell
