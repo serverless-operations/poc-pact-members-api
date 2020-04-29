@@ -17,8 +17,13 @@ yarn setup
 ```
 
 ### 環境変数の設定
-`.env` ファイルを作成して以下の環境変数をセットします
+`.env.example` をコピーして `.env` ファイルを作成、以下の環境変数をセットします
 ```
+# Lambda environment variables
+ASYNC_DOWNLOAD_MEMBERS_TOPIC_ARN=
+S3_BUCKET=
+
+# Testing environment variables
 PROVIDER_BASE_URL=
 PACT_BROKER_URL=
 PACT_BROKER_TOKEN=
