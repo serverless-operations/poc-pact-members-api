@@ -1,6 +1,5 @@
 import { v4 as uuidv4 } from 'uuid'
 
-import SNS from '~/aws/SNS'
 import DynamoDB from '~/aws/DynamoDB'
 
 import Environment from '~/Environment'
@@ -10,7 +9,7 @@ import NotFoundError from '~/errors/NotFoundError'
 
 export default class AsyncOperationRequestService {
 
-  public async loadAsyncOperationRecord(asyncRequestId: string) {
+  public async load(asyncRequestId: string) {
 
     const asyncOperation = await DynamoDB.get({
       TableName: Environment.ASYNC_OPERATIONS_TABLE_NAME,
@@ -25,19 +24,19 @@ export default class AsyncOperationRequestService {
     return asyncOperation
   }
 
-  public async updateAsyncOperationRecord(asyncOperation: AsyncOperation) {
+  public async update(asyncOperation: AsyncOperation) {
     await DynamoDB.put({ // TODO Use UPDATE
       TableName: Environment.ASYNC_OPERATIONS_TABLE_NAME,
       Item: asyncOperation
     }).promise()
   }
 
-  public async acceptRequest(params: { type: AsyncOperation['type'] }): Promise<string> {
+  public async acceptRequest(params: { type: AsyncOperation['type'] }): Promise<AsyncOperation> {
 
     switch (params.type) {
 
       case 'download_members':
-        return await this.requestDownloadMembers()
+        return await this.acceptDownloadMembers()
 
       default:
         throw new InternalServerError('UNEXPECTED_ERROR', 'Unexpected error thrown during async operation request')
@@ -58,29 +57,22 @@ export default class AsyncOperationRequestService {
     return asyncOperation
   }
 
-  private async requestDownloadMembers(): Promise<string> {
+  private async acceptDownloadMembers(): Promise<AsyncOperation> {
 
     const asyncRequestId = uuidv4()
 
-    const downloadMembersRequest: AsyncOperation = {
+    const asyncOperation: AsyncOperation = {
       asyncRequestId,
       type: 'download_members',
       status: 'processing',
       data: { downloadUrl: null }
     }
 
-    // TODO Testing DynamoDB Stream
     await DynamoDB.put({
       TableName: Environment.ASYNC_OPERATIONS_TABLE_NAME,
-      Item: downloadMembersRequest
+      Item: asyncOperation
     }).promise()
 
-    // For now, testing SNS instead
-    await SNS.publish({
-      TopicArn: Environment.ASYNC_DOWNLOAD_MEMBERS_TOPIC_ARN,
-      Message: asyncRequestId
-    }).promise()
-
-    return asyncRequestId
+    return asyncOperation
   }
 }

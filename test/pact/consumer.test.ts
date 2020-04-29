@@ -11,6 +11,7 @@ const { like } = Matchers
 import DownloadMembersEventAction from '~/event-actions/DownloadMembersEventAction'
 import Environment from '~/Environment'
 import DynamoDB from '~/aws/DynamoDB'
+import AsyncOperation from '~/models/AsyncOperation'
 
 const messagePact = new MessageConsumerPact({
   consumer: 'poc-pact-members-api-download',
@@ -22,10 +23,13 @@ const messagePact = new MessageConsumerPact({
 })
 
 const asyncRequestId = uuidv4()
+const action = new DownloadMembersEventAction()
 
 describe('Receive async download request', () => {
 
   beforeEach(async () => {
+
+    // Prerequisite
     await DynamoDB.put({
       TableName: Environment.ASYNC_OPERATIONS_TABLE_NAME,
       Item: {
@@ -35,22 +39,30 @@ describe('Receive async download request', () => {
         data: { downloadUrl: null }
       }
     }).promise()
-  })
 
-  // eslint-disable-next-line jest/expect-expect
-  test('accepts a download request', async () => {
-
-    const action = new DownloadMembersEventAction()
-
+    // Consume event
     await messagePact
-      .given('AsyncDownloadRequest')
-      .expectsToReceive('AsyncDownloadRequest')
+      .given('Accepting AsyncDownloadRequest')
+      .expectsToReceive('SNSEvent for AsyncDownloadRequest')
       .withContent({
         EventSubscriptionArn: like(Environment.ASYNC_DOWNLOAD_MEMBERS_TOPIC_ARN),
         Sns: {
           Message: like(asyncRequestId)
         }
       })
-      .verify(async (m: Message) =>  await action.handle(m.contents))
+      .verify(async (m: Message) => await action.handle(m.contents))
+  })
+
+  test('Asserting a download request', async () => {
+
+    const asyncOperation = await DynamoDB.get({
+      TableName: Environment.ASYNC_OPERATIONS_TABLE_NAME,
+      Key: { asyncRequestId },
+      ConsistentRead: true
+    }).promise().then(res => res.Item as AsyncOperation)
+
+    expect(asyncOperation).toBeTruthy()
+    expect(asyncOperation.asyncRequestId).toEqual(asyncRequestId)
+    expect(asyncOperation.data.downloadUrl).toBeTruthy() // or you can test more like regex of URL, actually to be able to download, etc...
   })
 })

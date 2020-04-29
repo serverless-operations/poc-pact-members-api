@@ -1,7 +1,6 @@
 import { Verifier, MessageProviderPact } from '@pact-foundation/pact'
-import { v4 as uuidv4 } from 'uuid'
-import DynamoDB from '~/aws/DynamoDB'
 import Environment from '~/Environment'
+import PostAsyncDownloadMembersAction from '~/actions/PostAsyncDownloadMembersAction'
 // import pkg from '../../package.json'
 
 const {
@@ -36,27 +35,18 @@ describe('Providers', () => {
     const messageProviderPact = new MessageProviderPact({
       provider: 'poc-pact-members-event',
       messageProviders: {
-        'AsyncDownloadRequest': async () => {
 
-          // FIXME Separate 'Create' and 'Publish' message
-          const asyncRequestId = uuidv4()
-          await DynamoDB.put({
-            TableName: Environment.ASYNC_OPERATIONS_TABLE_NAME,
-            Item: {
-              asyncRequestId,
-              type: 'download_members',
-              status: 'processing',
-              data: { downloadUrl: null }
-            }
-          }).promise()
-
-          return { // Should I make this myself...?
+        'SNSEvent for AsyncDownloadRequest': async () => {
+          const action = new PostAsyncDownloadMembersAction()
+          const asyncOperation = await action.createAsyncOperation()
+          return {
             EventSubscriptionArn: Environment.ASYNC_DOWNLOAD_MEMBERS_TOPIC_ARN,
             Sns: {
-              Message: asyncRequestId
+              Message: asyncOperation.asyncRequestId
             }
           }
         },
+
       },
       pactBrokerUrl: PACT_BROKER_URL,
       // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
