@@ -2,14 +2,15 @@
 Sample WebAPI for spiking Pact contract testing
 
 ## Pact テストのデモ実行手順
-Provider となる WebAPI のテストを実行して Pact を検証、ブローカーへ結果を送信します。  
+HTTP API の場合 Provider となる WebAPI のテストを実行して Pact を検証、ブローカーへ結果を送信します。  
+非同期テストの場合、イベントハンドラーとなる Consumer とイベントを発行する Provider のテストを実行して Pact を発行・検証、ブローカーへ結果を送信します。
 
 ### 前提条件
-予め Consumer からブローカーへ登録された Pact のタグ（e.g.`master`）とバージョン（e.g.`0.0.0`）を合わせて検証を実行する必要があります。
+HTTP API Provider テストの場合、予め Consumer からブローカーへ登録された Pact のタグ（e.g.`master`）の有無を確認した上でタグの指定・検証を行う必要があります。
 
 ### 実行環境
 - Node.js `v12.13.0` 以上
-- Yarn `1.22.0` 以上
+- Yarn `1.22.0￥ 以上
 
 ### 依存関係のセットアップ
 ```shell
