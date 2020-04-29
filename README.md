@@ -29,7 +29,14 @@ PACT_BROKER_URL=
 PACT_BROKER_TOKEN=
 ```
 
-### Provider による検証の実行
+### Pact テストの実行
 ```shell
-yarn test:pact
+# 非同期処理の Consumer テスト
+yarn test:pact-consumer
+
+# 非同期処理の Consumer テスト結果をブローカーへ送信する
+yarn test:publish
+
+# HTTP API, 非同期処理の Provider テスト
+yarn test:pact-provider
 ```
