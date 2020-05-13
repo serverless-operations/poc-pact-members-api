@@ -42,7 +42,7 @@
     "lint:fix": "eslint ./src --fix --ext .ts",
     "test:integrations": "jest --coverage --config test/jest.config.integrations.js",
     "test:pact-consumer": "rm -rf .pacts && jest --coverage --config test/jest.config.pact.consumer.js",
-    "test:pact-provider": "jest --coverage --config test/jest.config.pact.provider.js",
+    "test:pact-provider": "jest --coverage --config test/jest.config.pact.provider.js --runInBand",
     "test:publish": "ts-node test/publish.ts",
     "serve": "sls offline start --stage dev --region us-east-1",
     "clean": "rm -rf target yarn.lock node_modules",

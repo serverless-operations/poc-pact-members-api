@@ -19,9 +19,9 @@ export default class BatchAggregateMembersEventAction implements EventProviderAc
   }
 
   // Event Creater
-  public async createEvent() {
+  public async createEvent(defaultKey?: string) {
     const data = await new BatchAggregateMembersService().aggregate()
-    const objectKey = `batch_aggregation_members/${uuidv4()}.json`
+    const objectKey = `batch_aggregation_members/${defaultKey || uuidv4()}.json`
     const event = {
       s3PutParams: {
         Bucket: Environment.S3_BUCKET,

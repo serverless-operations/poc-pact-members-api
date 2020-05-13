@@ -8,5 +8,8 @@ export default Object.freeze({
   MEMBERS_TABLE_NAME: 'poc-pact-members-dev',
   ASYNC_OPERATIONS_TABLE_NAME: 'poc-pact-members-async-operations-dev',
   LOGIN_HISTORY_TABLE_NAME: 'poc-pact-members-login-history-dev',
+
+  // For testing sample
+  AGGREGATE_MEMBERS_DATA_OBJECT_KEY: '',
   ...process.env
 })
