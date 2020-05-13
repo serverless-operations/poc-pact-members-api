@@ -21,7 +21,7 @@ provider:
         - s3:*
       Resource: "*"
   deploymentBucket:
-    name: sls-artifacts-${self:provider.region}-${self:custom.awsAccountId}
+    name: poc-pact-members-deployment-${self:provider.region}-${self:custom.awsAccountId}
 
 functions:
   core:
@@ -36,6 +36,16 @@ functions:
       - http:
           path: /registration
           method: post
+          cors: ${self:custom.cors}
+          private: false
+      - http:
+          path: /members
+          method: get
+          cors: ${self:custom.cors}
+          private: false
+      - http:
+          path: /members/{user_id}
+          method: get
           cors: ${self:custom.cors}
           private: false
       - http:
@@ -54,6 +64,11 @@ functions:
     timeout: 300
     events:
       - sns: ${self:custom.sns.asyncDownloadMembersArn}
+      - s3:
+          bucket: ${self:custom.envVars.${self:provider.stage}.S3_BUCKET}
+          event: s3:ObjectCreated:*
+          rules:
+            - prefix: batch_aggregation_members/
 
 plugins:
   - serverless-dotenv-plugin
@@ -126,6 +141,23 @@ resources:
           KeySchema:
             - AttributeName: asyncRequestId
               KeyType: HASH
+          BillingMode: PAY_PER_REQUEST
+
+      LoginHistoryTable:
+        Type: AWS::DynamoDB::Table
+        DeletionPolicy: Retain
+        Properties:
+          TableName: poc-pact-members-login-history-${self:provider.stage}
+          AttributeDefinitions:
+            - AttributeName: userId 
+              AttributeType: S
+            - AttributeName: timestamp
+              AttributeType: S
+          KeySchema:
+            - AttributeName: userId
+              KeyType: HASH
+            - AttributeName: timestamp
+              KeyType: RANGE
           BillingMode: PAY_PER_REQUEST
 
       AsyncDownloadMembersTopic:

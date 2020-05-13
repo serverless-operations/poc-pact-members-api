@@ -40,7 +40,6 @@
   "scripts": {
     "lint": "eslint ./src --ext .ts",
     "lint:fix": "eslint ./src --fix --ext .ts",
-    "test:units": "jest --coverage --config test/jest.config.units.js",
     "test:integrations": "jest --coverage --config test/jest.config.integrations.js",
     "test:pact-consumer": "rm -rf .pacts && jest --coverage --config test/jest.config.pact.consumer.js",
     "test:pact-provider": "jest --coverage --config test/jest.config.pact.provider.js",

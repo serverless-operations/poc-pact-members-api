@@ -19,9 +19,9 @@ export default class AsyncDownloadMembersService  {
         'Unexpected asyncOperation values. There seems to be something wrong.')
     }
 
-    // NOTE PoC implemention
+    // NOTE PoC implemention. This would be suppose to be replaced with AWS Batch, etc.
     const members = await DynamoDB.scan({ TableName: Environment.MEMBERS_TABLE_NAME }).promise().then(res => res.Items)
-    const objectKey = `${uuidv4()}.json`
+    const objectKey = `download_members/${uuidv4()}.json`
 
     await S3.putObject({
       Bucket: Environment.S3_BUCKET,
@@ -34,6 +34,13 @@ export default class AsyncDownloadMembersService  {
       Key: objectKey,
       Expires: 600
     })
+
+    // Node Add-hoc implementation for demo
+    await S3.putObject({
+      Bucket: Environment.S3_BUCKET,
+      Key: 'download_members/latest.json',
+      Body: JSON.stringify(members)
+    }).promise()
 
     return downloadUrl
   }

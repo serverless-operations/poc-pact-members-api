@@ -8,7 +8,7 @@ import {
 } from '@pact-foundation/pact'
 const { like } = Matchers
 
-import DownloadMembersEventAction from '~/event-actions/DownloadMembersEventAction'
+import AsyncDownloadMembersEventAction from '~/event-actions/AsyncDownloadMembersEventAction'
 import Environment from '~/Environment'
 import DynamoDB from '~/aws/DynamoDB'
 import AsyncOperation from '~/models/AsyncOperation'
@@ -23,7 +23,7 @@ const messagePact = new MessageConsumerPact({
 })
 
 const asyncRequestId = uuidv4()
-const action = new DownloadMembersEventAction()
+const action = new AsyncDownloadMembersEventAction()
 
 describe('Receive async download request', () => {
 

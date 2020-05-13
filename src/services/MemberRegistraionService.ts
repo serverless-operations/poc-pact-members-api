@@ -10,7 +10,7 @@ export default class MemberRegistrationService {
 
     await DynamoDB.put({
       TableName: MEMBERS_TABLE_NAME,
-      Item: { ...form }
+      Item: { ...form, rank: 'PENDING' }
     }).promise()
 
     return form

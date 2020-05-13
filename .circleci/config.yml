@@ -68,7 +68,6 @@ jobs:
       - run:
           name: Test
           command: |
-            yarn test:units --maxWorkers=2
             yarn test:pact-consumer --maxWorkers=2
             yarn test:pact-provider --maxWorkers=2
       - store_artifacts:

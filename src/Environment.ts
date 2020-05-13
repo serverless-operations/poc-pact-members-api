@@ -7,5 +7,6 @@ export default Object.freeze({
   ASYNC_DOWNLOAD_MEMBERS_TOPIC_ARN: '',
   MEMBERS_TABLE_NAME: 'poc-pact-members-dev',
   ASYNC_OPERATIONS_TABLE_NAME: 'poc-pact-members-async-operations-dev',
+  LOGIN_HISTORY_TABLE_NAME: 'poc-pact-members-login-history-dev',
   ...process.env
 })
