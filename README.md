@@ -1,5 +1,5 @@
-# poc-pact-members-api
-Sample WebAPI for spiking Pact contract testing
+# poc-pact-members-backend
+Sample WebAPI and backend components for spiking Pact contract testing
 
 ## Pact テストのデモ実行手順
 HTTP API の場合 Provider となる WebAPI のテストを実行して Pact を検証、ブローカーへ結果を送信します。  
