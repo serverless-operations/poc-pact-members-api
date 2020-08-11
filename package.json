@@ -28,7 +28,7 @@
     "jest": "^25.1.0",
     "serverless": "1.63.0",
     "serverless-dotenv-plugin": "^2.4.2",
-    "serverless-offline": "^5.12.1",
+    "serverless-offline": "^6.5.0",
     "serverless-webpack": "^5.3.1",
     "ts-jest": "^25.2.0",
     "ts-loader": "^6.2.1",
